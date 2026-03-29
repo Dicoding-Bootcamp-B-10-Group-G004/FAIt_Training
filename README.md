@@ -1,6 +1,39 @@
 # FAIt_Training
 Repository untuk preprocessing, training dan konversi model untuk aplikasi FAIt
 
+Tutorial Penggunaan Pipeline Preprocessing
+
+1. Menyiapkan Akun Weights & Biases (W&B)
+   Pastikan Anda telah memiliki akun pada platform Weights & Biases (W&B) serta API Key yang aktif.
+
+2. Konfigurasi API Key di Google Colab
+   Masukkan *API Key* W&B ke dalam menu *Secrets* di Google Colab dengan mengisi *name* dan *value* sesuai dengan kredensial yang dimiliki.
+
+3. Persiapan Dataset
+   Siapkan dataset dengan format YOLOv8/YOLO format (yolo26) sesuai dengan kebutuhan pipeline.
+
+4. Menjalankan Dependensi dan Fungsi
+   Eksekusi seluruh blok kode yang berisi instalasi dependensi serta definisi fungsi yang diperlukan pada notebook Google Colab.
+
+5. Mengunduh Dataset
+   Lakukan pengunduhan dataset dari sumber yang tersedia, seperti W&B, Google Drive, atau Roboflow, dengan memastikan format dataset tetap konsisten (yolo26).
+
+6. Transformasi Dataset ke DataFrame
+   Jalankan fungsi yang tersedia untuk menggabungkan dan mengonversi dataset menjadi bentuk *DataFrame* guna memudahkan proses analisis.
+
+7. Eksplorasi dan Analisis Data (EDA)
+   Lakukan proses eksplorasi data (*Exploratory Data Analysis*) serta analisis dan manipulasi data sesuai kebutuhan.
+
+8. Web Scraping Data Nilai Gizi Berdasarkan Label
+   Jalankan kode *web scraping* untuk mengambil informasi nilai gizi berdasarkan label makanan dari situs FatSecret Indonesia. Data yang diambil dapat meliputi kalori, protein, lemak, dan karbohidrat.
+
+9. Konversi Kembali ke Format Dataset
+   Setelah seluruh proses analisis dan penambahan data selesai, jalankan fungsi untuk mengonversi kembali *DataFrame* menjadi format dataset semula.
+
+10. Upload Dataset ke W&B
+    Terakhir, jalankan fungsi yang tersedia untuk mengunggah dataset hasil preprocessing ke platform W&B.
+
+
 Tutorial Implementasi Pipeline YOLO & Weights & Biases (WandB)
 
 Tutorial ini akan dari tahap persiapan lingkungan hingga evaluasi model menggunakan integrasi pelacakan eksperimen otomatis.
