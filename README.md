@@ -1,32 +1,67 @@
 # FAIt_Training
 Repository untuk preprocessing, training dan konversi model untuk aplikasi FAIt
 
-Tutorial Pipeline Pelatihan YOLO:
-Ikuti langkah-langkah di bawah ini untuk menjalankan pipeline pelatihan model deteksi objek menggunakan YOLO dan integrasi Weights & Biases (WandB).
+Tutorial Implementasi Pipeline YOLO & Weights & Biases (WandB)
 
-1. Persiapan Akun dan API Key
-Weights & Biases (WandB): Siapkan akun di wandb.ai. Ambil API Key dari pengaturan profil.
-Jika menggunakan Google Colab, masukkan API Key tersebut ke dalam menu Secrets (ikon kunci di panel kiri) dengan nama WANDB_API_KEY dan aktifkan akses notebook.
+Tutorial ini akan dari tahap persiapan lingkungan hingga evaluasi model menggunakan integrasi pelacakan eksperimen otomatis.
 
-2. Instalasi Dependensi
-Jalankan perintah berikut untuk menginstal library yang diperlukan seperti ultralytics untuk YOLO, wandb untuk tracking, dan ray untuk optimasi model:
-    pip install ultralytics "ray[tune]" wandb sng4onnx onnx_graphsurgeon ai-edge-litert onnxruntime-gpu
+1. Persiapan Kredensial (WandB API Key)
+Sebelum mulai menyentuh kode, kita memerlukan akses ke Weights & Biases untuk mencatat log training.
+- Dapatkan API Key: Masuk ke wandb.ai/settings dan salin API Key.
+- Konfigurasi di Google Colab:
+    1. Klik ikon kunci (Secrets) di panel sebelah kiri.
+    2. Tambahkan new secret dengan nama WANDB_API_KEY.
+    3. Masukkan API Key di kolom Value.
+    4. Aktifkan centang Notebook access agar script dapat membaca kunci tersebut secara otomatis.
+- Konfigurasi di Kaggle:
+    1. Buka menu Add-ons > Secrets.
+    2. Tambahkan label WANDB_API_KEY dengan nilai API Key.
 
-3. Konfigurasi Environment
-Aktifkan integrasi WandB pada pengaturan YOLO agar semua log pelatihan terkirim secara otomatis ke dashboard Anda:
+2. Instalasi dan Setup Environment
+Langkah pertama dalam notebook adalah menginstal semua dependensi yang diperlukan. Pipeline ini membutuhkan ultralytics untuk YOLO machine dan beberapa library tambahan untuk optimasi dan penanganan format model.
+
+    #Instalasi library utama
+    !pip install ultralytics "ray[tune]" wandb sng4onnx onnx_graphsurgeon ai-edge-litert onnxruntime-gpu
+
+Setelah instalasi, aktifkan integrasi WandB di pengaturan YOLO agar setiap metrik pelatihan (seperti loss dan mAP) langsung terkirim ke dashboard.
+
+    #Mengaktifkan tracking WandB pada YOLO
     !yolo settings wandb=True
 
-4. Manajemen Dataset dengan WandB
-Gunakan kelas WandbHandler yang tersedia di notebook untuk mengelola dataset secara otomatis:
-Download Dataset: Mengunduh dataset langsung dari artifact WandB ke direktori lokal /content/dataset/.
-Upload/Update: Mengunggah versi terbaru dataset atau file spesifik ke WandB untuk kontrol versi data yang lebih baik.
+3. Manajemen Dataset dengan WandbHandler
 
-5. Menjalankan Training
-Inisialisasi model YOLO (misalnya yolo26n.pt) dan mulai proses pelatihan. Pipeline ini sudah dilengkapi dengan fungsi kustom untuk mencatat metrik tambahan seperti Precision-Recall Curve ke dalam tabel WandB agar hasil evaluasi lebih detail.
+Notebook ini menggunakan kelas khusus bernama WandbHandler untuk menyederhanakan interaksi dengan dataset yang disimpan sebagai artifact di WandB. Ini memastikan seluruh tim menggunakan versi data yang sama.
 
-6. Monitoring dan Validasi
+- Inisialisasi: Buat objek handler dengan menentukan nama proyek dan nama run.
+- Download Dataset: Gunakan fungsi download_from_wandb('nama_dataset'). Skrip akan memeriksa apakah dataset sudah ada di direktori /content/dataset/ untuk menghindari pengunduhan ulang yang sia-sia.
+- Update/Upload: Jika Anda melakukan perubahan pada data lokal, gunakan upload_to_wandb atau update_file untuk menyinkronkan perubahan tersebut kembali ke awan.
 
-Dashboard WandB: Pantau grafik loss dan akurasi secara real-time melalui link project WandB yang muncul saat running.
-Cek Hasil: Setelah pelatihan selesai, hasil validasi dan bobot model terbaik akan tersimpan di folder runs/detect/val.
+4. Proses Pelatihan (Training)
 
-Catatan: Pastikan struktur folder dataset Anda sudah sesuai dengan format yang diminta oleh YOLO (memiliki file .yaml konfigurasi) sebelum memulai pelatihan.
+Training model dimulai dengan memanggil fungsi YOLO. Pipeline ini mendukung fitur resume jika training terhenti di tengah jalan.
+
+    from ultralytics import YOLO
+
+    # Memuat model (misal: versi nano untuk kecepatan)
+    model = YOLO('yolo11n.pt')
+
+    # Memulai pelatihan
+    results = model.train(
+        data='/content/dataset/data.yaml', 
+        epochs=100, 
+        imgsz=640,
+        project='nama_proyek_anda',
+        name='eksperimen_1'
+    )
+
+5. Visualisasi Metrik Custom
+
+Salah satu keunggulan pipeline ini adalah adanya fungsi _custom_table dan _plot_curve. Fungsi ini akan membuat tabel visualisasi kustom di WandB, seperti Precision-Recall Curve, yang jauh lebih detail daripada grafik standar YOLO.
+Metrik ini akan membantu menganalisis kelas mana yang memiliki performa paling lemah sehingga dapat mengetahui bagian mana dari dataset yang perlu diperbaiki.
+
+6. Evaluasi dan Penyimpanan Model
+
+Setelah pelatihan selesai:
+    1. Cek Dashboard: Buka link proyek di WandB untuk melihat perbandingan antar eksperimen.
+    2. Validasi: Jalankan validasi pada set pengujian menggunakan bobot terbaik (best.pt) yang tersimpan di direktori runs/detect/.
+    3. Ekspor: Jika diperlukan, model dapat diekspor ke format ONNX atau TFLite untuk penggunaan di perangkat mobile atau web menggunakan pustaka yang sudah diinstal di awal.
