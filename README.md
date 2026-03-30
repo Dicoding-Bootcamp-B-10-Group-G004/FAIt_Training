@@ -1,7 +1,7 @@
 # FAIt_Training
 Repository untuk preprocessing, training dan konversi model untuk aplikasi FAIt
 
-Tutorial Penggunaan Pipeline Preprocessing
+## Tutorial Penggunaan Pipeline Preprocessing
 
 1. Menyiapkan Akun Weights & Biases (W&B)
    Pastikan Anda telah memiliki akun pada platform Weights & Biases (W&B) serta API Key yang aktif.
@@ -34,7 +34,7 @@ Tutorial Penggunaan Pipeline Preprocessing
     Terakhir, jalankan fungsi yang tersedia untuk mengunggah dataset hasil preprocessing ke platform W&B.
 
 
-Tutorial Implementasi Pipeline YOLO & Weights & Biases (WandB)
+## Tutorial Implementasi Pipeline YOLO & Weights & Biases (WandB)
 
 Tutorial ini akan dari tahap persiapan lingkungan hingga evaluasi model menggunakan integrasi pelacakan eksperimen otomatis.
 
