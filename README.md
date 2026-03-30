@@ -98,3 +98,54 @@ Setelah pelatihan selesai:
     1. Cek Dashboard: Buka link proyek di WandB untuk melihat perbandingan antar eksperimen.
     2. Validasi: Jalankan validasi pada set pengujian menggunakan bobot terbaik (best.pt) yang tersimpan di direktori runs/detect/.
     3. Ekspor: Jika diperlukan, model dapat diekspor ke format ONNX atau TFLite untuk penggunaan di perangkat mobile atau web menggunakan pustaka yang sudah diinstal di awal.
+
+## Conversion Pipeline 
+
+Conversion pipeline ini digunakan untuk mengubah model hasil training menjadi model TFLite yang sudah terkuantisasi. 
+
+> **Kenapa dipisah?**  
+Konversi model ke format TFLite sebenarnya sudah ada di training pipeline. Namun, proses kuantisasi butuh resource yang cukup besar sehingga kalau digabung di training pipeline bisa bikin kode training crash karena kehabisan resource. Makanya, pipeline konversi ini dibuat terpisah supaya lebih stabil dan efisien.
+
+---
+
+### Tutorial Penggunaan Conversion Pipeline
+
+#### Prasyarat
+- Sudah punya akun **Weights & Biases (W&B)** dan API key-nya.
+- Sudah selesai melakukan training dan punya model yang sudah jadi.
+- Upload conversion pipeline ke platform seperti **Kaggle** atau **Google Colab**.
+
+---
+
+#### Langkah-langkah
+
+1. **Input API Key**  
+   Pastikan API key W&B sudah diinputkan ke bagian *secrets* di Kaggle/Colab agar pipeline bisa akses project dan artifact.
+
+2. **Setting Parameter Proyek**  
+   Atur beberapa variabel penting:  
+   - Nama proyek di W&B  
+   - Nama model yang ingin dikonversi  
+   - Nama dataset yang digunakan untuk training
+
+3. **Cek Dataset**  
+   Pastikan dataset yang dipakai di pipeline ini sama dengan dataset yang digunakan saat training model. Ini penting supaya kuantisasi berjalan optimal.
+
+4. **Setting Parameter Konversi**  
+   Ada dua parameter utama yang perlu diatur:  
+   - **imgz**: Ukuran input gambar yang akan diterima saat model mobile dijalankan.  
+     > Mengatur `imgz` bisa membuat model jadi lebih kecil dan proses inferensi lebih cepat, tapi ada trade-off di akurasi.  
+   - **Fraction**: Persentase jumlah gambar dari dataset yang digunakan untuk proses kuantisasi.  
+     > Untuk dataset kecil, cukup pakai sekitar 10%.  
+     > Untuk dataset besar, disarankan menggunakan sekitar 300-500 gambar.  
+     > Semakin banyak gambar yang dipakai, prosesnya akan lebih lama dan butuh resource lebih besar, tapi hasil model akan lebih akurat.
+
+5. **Jalankan Semua Kode**  
+   Setelah semua parameter diatur, jalankan pipeline.  
+   Setelah selesai, model yang sudah terkonversi dan terkuantisasi akan otomatis diupload ke W&B sebagai artifact.
+
+---
+
+## Catatan Tambahan
+- Pastikan resource di platform yang digunakan cukup untuk proses konversi, terutama saat menggunakan fraction besar.
+
